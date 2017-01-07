@@ -8,9 +8,9 @@
 #include <ESP8266WiFi.h>
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
-char auth[] = "61482d630a864822949fc3fb1ad431a5";
-char ssid[] = "PrettyFlyForAWiFi";
-char pass[] = "custom2015";
+char auth[] = "xxxxx";
+char ssid[] = "xxxxx";
+char pass[] = "xxxxx";
 
 int setupTask1, setupTask2, setupTask3, setupTask4, setupTask5;
 int timerTask1, timerTask2, timerTask3, timerTask4, timerTask5;
@@ -141,10 +141,19 @@ void AddressRegistry_311A() {
 }
 
 
+
+void loop()
+{
+  Blynk.run();
+  ArduinoOTA.handle();
+  timer.run();
+}
+
+
 // --------------------------------------------------------------------------------
-// MAIN DATA
+// EXAMPLE OF WRITING TO THE CONTROLLER - WILL ADD LATER
 
-
+ /*
 
 void tracerGet() {
 
@@ -156,7 +165,7 @@ void tracerGet() {
   }
 
   //Get Date and Time, and update Controller Data and Time
-  /*
+ 
     if (numLoops == 10000) { // Get date and time every 10000 loops
 
       dtString = getTime();
@@ -268,16 +277,8 @@ void tracerGet() {
       }
 
     }
-  */
+ 
 }
 
+ */
 
-
-
-void loop()
-{
-  Blynk.run();
-  ArduinoOTA.handle();
-  timer.run();
-  tracerGet();
-}
