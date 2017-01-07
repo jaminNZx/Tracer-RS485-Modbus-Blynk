@@ -3,4 +3,4 @@ An arduino sketch to connect the EPSolar/EPEver Tracer A/B Series (RS-485 Modbus
 
 Feel free to make pull requests if you wish to help develop it. 
 
-There is also a support forum on the Blynk community forums: 
+There is also a support forum on the Blynk community forums: http://community.blynk.cc/t/epsolar-tracer-2210a-charge-controller-blynk-epic-solar-monitor/10596
