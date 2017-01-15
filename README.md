@@ -25,13 +25,29 @@ There is also a support forum on the Blynk community forums: http://community.bl
 
 Cut open your ethernet cable and split out pin 3,5,7 (B,A,GND)
 
-Follow the wiring guide below:
+Follow the wiring guide below: (note that the 2-pol switch is only needed during flashing)
 ![Tracer Wiring Diagram](http://i.imgur.com/OktbhPG.png)
 
 ## Setup
 
-Open the Blynk mobile app and create a new project
-Send yourself the generate auth code
-Paste your auth code in to the sketch
+* Open the Blynk mobile app and create a new project by scanning the following QR code
 
+![Project QR Code](http://i.imgur.com/xBEmJyJ.jpg)
 
+* Send yourself the generate auth code
+* Paste your auth code in to the sketch
+
+```cpp
+char auth[] = "xxxxx";
+```
+
+* Enter your wifi SSID and PASS
+
+```cpp
+char ssid[] = "xxxxx";
+char pass[] = "xxxxx";
+```
+
+* Disconnect the TX/RX cables (or open the switch if you have one)
+* Upload the sketch to your ESP8266
+* Load the app and cre
