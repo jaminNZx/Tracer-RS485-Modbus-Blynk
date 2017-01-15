@@ -23,7 +23,7 @@ There is also a support forum on the Blynk community forums: http://community.bl
 
 ## Wiring
 
-Cut open your ethernet cable and split out pin 3,5,7 (B,A,GND)
+Cut open your ethernet cable and split out pin 3,5,7 (B,A,GND). Refer to reference below for additional info.
 
 Follow the wiring guide below: (note that the 2-pol switch is only needed during flashing)
 ![Tracer Wiring Diagram](http://i.imgur.com/OktbhPG.png)
@@ -61,9 +61,16 @@ char pass[] = "xxxxx";
 * Once uploaded, reconnect the TX/RX cables and plug the cable in to the Tracer COM port 
 * Load the Blynk project and hit the PLAY button to start receiving data
 
+## Reference
+
+[Tracer A/B Series Modbus Protocol](http://www.solar-elektro.cz/data/dokumenty/1733_modbus_protocol.pdf)
+
 ## Developing further
 
 I plan to add more features and pull more data from the controller once I have my own solar system running.
 
 If you'd like to pick this up and have a go at adding features, I'll be happy to accept pull requests. 
 
+## Credits
+
+Thanks to subtafuge on [Reddit](https://www.reddit.com/r/esp8266/comments/59dt00/using_esp8266_to_connect_rs485_modbus_protocol/) for lending me his working Tracer RS485 code! 
