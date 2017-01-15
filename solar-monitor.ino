@@ -12,6 +12,9 @@ char auth[] = "xxxxx";
 char ssid[] = "xxxxx";
 char pass[] = "xxxxx";
 
+// Set 1 using local Blynk Server. Set server IP in setup()
+#define localServer 0
+
 int setupTask1, setupTask2, setupTask3, setupTask4, setupTask5;
 int timerTask1, timerTask2, timerTask3, timerTask4, timerTask5;
 
@@ -45,7 +48,11 @@ void setup()
   node.preTransmission(preTransmission);
   node.postTransmission(postTransmission);
   WiFi.mode(WIFI_STA);
-  Blynk.begin(auth, ssid, pass, IPAddress(192, 168, 1, 2));
+  if(!localServer){
+    Blynk.begin(auth, ssid, pass);
+  } else {
+    Blynk.begin(auth, ssid, pass, IPAddress(192, 168, 1, 2)); // local Blynk server IP
+  } 
   while (Blynk.connect() == false) {}
   ArduinoOTA.setHostname("Solar-Charge-Controller");
   ArduinoOTA.begin();
