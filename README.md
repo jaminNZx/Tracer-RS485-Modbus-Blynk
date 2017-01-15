@@ -13,9 +13,25 @@ There is also a support forum on the Blynk community forums: http://community.bl
 
 * [ESP8266 Dev Board](https://www.aliexpress.com/wholesale?catId=0&initiative_id=SB_20170114172938&SearchText=esp8266+mini)
 
+* An old ethernet cable with RJ45 connector you are happy to cut open
+
 ## Software
 
-* [Blynk](http://www.blynk.cc/) Mobile App ([iOS](https://itunes.apple.com/us/app/blynk-iot-for-arduino-rpi/id808760481?mt=8) & [Android](https://www.google.co.nz/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0ahUKEwiqoe_SgMPRAhWDj5QKHYKkABUQFggYMAA&url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcc.blynk%26hl%3Den&usg=AFQjCNG40Tu06qh0axcbfn8k2CrI6i67Ng&bvm=bv.144224172,d.dGo))
+* [Blynk](http://www.blynk.cc/) Mobile App ([iOS](https://itunes.apple.com/us/app/blynk-iot-for-arduino-rpi/id808760481?mt=8) & [Android](https://play.google.com/store/apps/details?id=cc.blynk&hl=en))
 * Arduino IDE 1.6.9+
 * The project sketch
+
+## Wiring
+
+Cut open your ethernet cable and split out pin 3,5,7 (B,A,GND)
+
+Follow the wiring guide below:
+![Tracer Wiring Diagram](http://i.imgur.com/OktbhPG.png)
+
+## Setup
+
+Open the Blynk mobile app and create a new project
+Send yourself the generate auth code
+Paste your auth code in to the sketch
+
 
