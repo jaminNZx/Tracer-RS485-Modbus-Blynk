@@ -15,13 +15,26 @@ char pass[] = "xxxxx";
 // Set 1 using local Blynk Server. Set server IP in setup()
 #define localServer 0
 
-int setupTask1, setupTask2, setupTask3, setupTask4, setupTask5;
-int timerTask1, timerTask2, timerTask3, timerTask4, timerTask5;
+// Blynk VirtualPin definitions. This helps when creating a new dash in Blynk.
+#define vpin_vpower 1
+#define vpin_pvcurrent 2
+#define vpin_pvvoltage 3
+#define vpin_lcurrent 4
+#define vpin_lpower 5
+#define vpin_btemp 6
+#define vpin_bvoltage 7
+#define vpin_bremaining 8
+#define vpin_ctemp 9
+
+int timerTask1, timerTask2, timerTask3;
 
 float bvoltage, ctemp, btemp, bremaining, lpower, lcurrent, pvvoltage, pvcurrent, pvpower;
-uint8_t result, time1, time2, time3, date1, date2, date3, dateDay, dateMonth, dateYear, timeHour, timeMinute, timeSecond;
-char buf[10];
-String dtString;
+
+// To add later
+//uint8_t result, time1, time2, time3, date1, date2, date3, dateDay, dateMonth, dateYear, timeHour, timeMinute, timeSecond;
+//char buf[10];
+//String dtString;
+
 bool rs485DataReceived = true;
 
 const int debug = 1; //change to 0 when you are finished debugging
@@ -65,15 +78,15 @@ void setup()
 // --------------------------------------------------------------------------------
 
 void updateBlynk() {
-  Blynk.virtualWrite(1, pvpower);
-  Blynk.virtualWrite(2, pvcurrent);
-  Blynk.virtualWrite(3, pvvoltage);
-  Blynk.virtualWrite(4, lcurrent);
-  Blynk.virtualWrite(5, lpower);
-  Blynk.virtualWrite(6, btemp);
-  Blynk.virtualWrite(7, bvoltage);
-  Blynk.virtualWrite(8, bremaining);
-  Blynk.virtualWrite(9, ctemp);
+  Blynk.virtualWrite(vpin_vpower, pvpower);
+  Blynk.virtualWrite(vpin_pvcurrent, pvcurrent);
+  Blynk.virtualWrite(vpin_pvvoltage, pvvoltage);
+  Blynk.virtualWrite(vpin_lcurrent, lcurrent);
+  Blynk.virtualWrite(vpin_lpower, lpower);
+  Blynk.virtualWrite(vpin_btemp, btemp);
+  Blynk.virtualWrite(vpin_bvoltage, bvoltage);
+  Blynk.virtualWrite(vpin_bremaining, bremaining);
+  Blynk.virtualWrite(vpin_ctemp, ctemp);
 }
 
 void doRegistryNumber() {
