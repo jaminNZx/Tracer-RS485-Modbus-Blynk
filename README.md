@@ -34,7 +34,7 @@ Follow the wiring guide below: (note that the 2-pol switch is only needed during
 
 ![Project QR Code](http://i.imgur.com/xBEmJyJ.jpg)
 
-* Send yourself the generate auth code
+* Send yourself the generated auth code
 * Paste your auth code in to the sketch
 
 ```cpp
@@ -50,4 +50,11 @@ char pass[] = "xxxxx";
 
 * Disconnect the TX/RX cables (or open the switch if you have one)
 * Upload the sketch to your ESP8266
-* Load the app and cre
+* Once uploaded, reconnect the TX/RX cables and plug the cable in to the Tracer COM port 
+* Load the Blynk project and hit the PLAY button to start receiving data
+
+## Developing further
+
+I plan to add more features and pull more data from the controller once I have my own solar system running. 
+If you'd like to pick this up and have a go at adding features, I'll be happy to accept pull requests. 
+
