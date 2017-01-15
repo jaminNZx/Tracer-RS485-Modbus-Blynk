@@ -30,6 +30,14 @@ Follow the wiring guide below: (note that the 2-pol switch is only needed during
 
 ## Setup
 
+### Libraries
+
+Blynk Library
+ArduinoOTA
+SimpleTimer 
+
+### Tutorial
+
 * Open the Blynk mobile app and create a new project by scanning the following QR code
 
 ![Project QR Code](http://i.imgur.com/xBEmJyJ.jpg)
