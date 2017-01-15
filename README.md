@@ -32,9 +32,9 @@ Follow the wiring guide below: (note that the 2-pol switch is only needed during
 
 ### Libraries
 
-Blynk Library�
-ArduinoOTA�
-SimpleTimer 
+* Blynk Library
+* ArduinoOTA
+* SimpleTimer 
 
 ### Tutorial
 
@@ -63,6 +63,7 @@ char pass[] = "xxxxx";
 
 ## Developing further
 
-I plan to add more features and pull more data from the controller once I have my own solar system running. �
+I plan to add more features and pull more data from the controller once I have my own solar system running.
+
 If you'd like to pick this up and have a go at adding features, I'll be happy to accept pull requests. 
 
