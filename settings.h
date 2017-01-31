@@ -5,9 +5,9 @@
  **************************************************************/
 /*
    Auth Codes & Wifi info go in the following file.
-   Create a new folder in your library dir called 'private_credentials_garduino'
-   and create a new file called 'private_credentials_garduino.h' and copy the 
-   example in the repo.
+   Create a new folder in your library dir called 'wifi_credentials'
+   and create a new file called 'wifi_credentials.h' and copy the 
+   example in the repo. You can use this for all your wifi projects. 
 */
 #include <wifi_credentials.h>
 /*
@@ -16,6 +16,7 @@
 #define AUTH                            "61482d630a864822949fc3fb1ad431a5"
 /*
    Local Server Settings
+   Comment out to use Cloud Server
 */
 #define USE_LOCAL_SERVER       
 #define SERVER                          IPAddress(192, 168, 1, 2)
@@ -27,7 +28,6 @@
 /*
    Virtual Pins - Base
 */
-
 #define vPIN_PV_POWER                   V1
 #define vPIN_PV_CURRENT                 V2
 #define vPIN_PV_VOLTAGE                 V3
