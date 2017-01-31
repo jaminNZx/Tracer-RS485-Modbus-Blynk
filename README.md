@@ -23,7 +23,7 @@ There is also a support forum on the Blynk community forums: http://community.bl
 
 ## Wiring
 
-Cut open your ethernet cable and split out pin 3,5,7 (B,A,GND). Refer to reference below for additional info.
+Cut open your ethernet cable and split out pin 3,5,7 (B,A,GND). Refer to [Tracer Modbus PDF](http://www.solar-elektro.cz/data/dokumenty/1733_modbus_protocol.pdf) for additional info.
 
 Follow the wiring guide below: (note that the 2-pol switch is only needed during flashing)
 ![Tracer Wiring Diagram](http://i.imgur.com/OktbhPG.png)
@@ -39,6 +39,7 @@ Follow the wiring guide below: (note that the 2-pol switch is only needed during
 ### Tutorial
 
 * Create wifi_credentials.h library. 
+
 Firstly, create a folder in your sketch/library folder call 'wifi_credentials'. Then create a new file call wifi_credentials.h and enter the following template. Change the details for your own wifi network. 
 
 You will be able to use this file by including it in any sketch by entering ```#include <wifi_credentials.h>```.
@@ -57,17 +58,10 @@ You will be able to use this file by including it in any sketch by entering ```#
 ![Project QR Code](http://i.imgur.com/xBEmJyJ.jpg)
 
 * Send yourself the generated auth code
-* Paste your auth code in to the sketch
+* Paste your auth code in to the settings.h file
 
 ```cpp
-char auth[] = "xxxxx";
-```
-
-* Enter your wifi SSID and PASS
-
-```cpp
-char ssid[] = "xxxxx";
-char pass[] = "xxxxx";
+#define AUTH                  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
 * Disconnect the TX/RX cables (or open the switch if you have one)
