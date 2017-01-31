@@ -38,6 +38,20 @@ Follow the wiring guide below: (note that the 2-pol switch is only needed during
 
 ### Tutorial
 
+* Create wifi_credentials.h library. 
+Firstly, create a folder in your sketch/library folder call 'wifi_credentials'. Then create a new file call wifi_credentials.h and enter the following template. Change the details for your own wifi network. 
+
+You will be able to use this file by including it in any sketch by entering ```#include <wifi_credentials.h>```.
+
+```cpp
+/**************************************************************
+ *           Settings - Wifi Credentials
+ **************************************************************/
+#define WIFI_SSID             "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+#define WIFI_PASS             "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+```
+
 * Open the Blynk mobile app and create a new project by scanning the following QR code
 
 ![Project QR Code](http://i.imgur.com/xBEmJyJ.jpg)
