@@ -1,8 +1,5 @@
-
-
 // CONNECT THE RS485 MODULE RX->RX, TX->TX.
 // Disconnect when uploading code.
-
 #include <ArduinoOTA.h>
 #include <BlynkSimpleEsp8266.h>
 #include <SimpleTimer.h>
@@ -12,7 +9,6 @@
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 int timerTask1, timerTask2, timerTask3;
-
 float battBhargeCurrent, bvoltage, ctemp, btemp, bremaining, lpower, lcurrent, pvvoltage, pvcurrent, pvpower;
 float stats_today_pv_volt_min, stats_today_pv_volt_max;
 uint8_t result;
@@ -22,23 +18,26 @@ uint8_t result;
 //char buf[10];
 //String dtString;
 
+// this is to check if we can write since rs485 is half duplex
 bool rs485DataReceived = true;
 
 ModbusMaster node;
 SimpleTimer timer;
 
+// tracer requires no handshaking
 void preTransmission() {}
 void postTransmission() {}
 
+// a list of the regisities to query in order
 typedef void (*RegistryList[])();
 RegistryList Registries = {
   AddressRegistry_3100,
   AddressRegistry_311A,
   AddressRegistry_3300,
 };
-
+// keep log of where we are
 uint8_t currentRegistryNumber = 0;
-
+// function to switch to next registry
 void nextRegistryNumber() {
   currentRegistryNumber = (currentRegistryNumber + 1) % ARRAY_SIZE( Registries);
 }
