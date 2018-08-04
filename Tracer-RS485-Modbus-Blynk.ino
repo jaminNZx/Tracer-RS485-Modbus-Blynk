@@ -83,7 +83,7 @@ void doRegistryNumber() {
 }
 
 void AddressRegistry_3100() {
-  result = node.readInputRegisters(0x3100, 7);
+  result = node.readInputRegisters(0x3100, 0x12);
   if (result == node.ku8MBSuccess)
   {
     ctemp = node.getResponseBuffer(0x11) / 100.0f;
