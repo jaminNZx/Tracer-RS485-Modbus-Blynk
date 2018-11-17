@@ -1,152 +1,260 @@
-// CONNECT THE RS485 MODULE RX->RX, TX->TX.
-// Disconnect when uploading code.
+// CONNECT THE RS485 MODULE RX->D13, TX->D2. (Serial1)
+// You do not need to disconnect the RS485 while uploading code.
+// Tested on NodeMCU + MAX485 module
+// RJ 45 cable: Green -> A, Blue -> B
+// MAX485: DE + RE interconnected with a jumper and connected to D3 or D4
+// Developed by @jaminNZx
+// With modifications by @tekk
+
 #include <ArduinoOTA.h>
 #include <BlynkSimpleEsp8266.h>
 #include <SimpleTimer.h>
 #include <ModbusMaster.h>
 #include <ESP8266WiFi.h>
+#include <DNSServer.h>
+#include <ESP8266WebServer.h>
 #include "settings.h"
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
-int timerTask1, timerTask2, timerTask3;
-float battBhargeCurrent, bvoltage, ctemp, btemp, bremaining, lpower, lcurrent, pvvoltage, pvcurrent, pvpower;
-float stats_today_pv_volt_min, stats_today_pv_volt_max;
-uint8_t result;
+static int timerTaskReadAndUpload;
+static float battChargeCurrent, battDischargeCurrent, battChargePower;
+static float bvoltage, ctemp, btemp, bremaining, lpower, lcurrent, pvvoltage, pvcurrent, pvpower;
+static float stats_today_pv_volt_min, stats_today_pv_volt_max;
+static uint8_t result;
+static bool rs485DataReceived = true;
+static bool loadPoweredOn = true;
 
-// To add later
-//uint8_t result, time1, time2, time3, date1, date2, date3, dateDay, dateMonth, dateYear, timeHour, timeMinute, timeSecond;
-//char buf[10];
-//String dtString;
-
-// this is to check if we can write since rs485 is half duplex
-bool rs485DataReceived = true;
+#define MAX485_DE D3
+#define MAX485_RE_NEG D4
 
 ModbusMaster node;
-SimpleTimer timer;
 
-// tracer requires no handshaking
-void preTransmission() {}
-void postTransmission() {}
+void preTransmission() {
+  digitalWrite(MAX485_RE_NEG, 1);
+  digitalWrite(MAX485_DE, 1);
+}
 
-// a list of the regisities to query in order
-typedef void (*RegistryList[])();
-RegistryList Registries = {
-  AddressRegistry_3100,
-  AddressRegistry_311A,
-  AddressRegistry_3300,
-};
-// keep log of where we are
-uint8_t currentRegistryNumber = 0;
-// function to switch to next registry
-void nextRegistryNumber() {
-  currentRegistryNumber = (currentRegistryNumber + 1) % ARRAY_SIZE( Registries);
+void postTransmission() {
+  digitalWrite(MAX485_RE_NEG, 0);
+  digitalWrite(MAX485_DE, 0);  
 }
 
 void setup()
 {
-  Serial.begin(115200);
+  pinMode(MAX485_RE_NEG, OUTPUT);
+  pinMode(MAX485_DE, OUTPUT);
+  
+  digitalWrite(MAX485_RE_NEG, 0);
+  digitalWrite(MAX485_DE, 0);
+
+  Serial.begin(115200);  
+  Serial1.begin(115200, SERIAL_8N1);
+  
   // Modbus slave ID 1
-  node.begin(1, Serial);
+  node.begin(1, Serial1);
+  
   node.preTransmission(preTransmission);
   node.postTransmission(postTransmission);
+  
+  if (debug == 1)
+    Serial.println("Connecting to Wifi...");
+  
   WiFi.mode(WIFI_STA);
 #if defined(USE_LOCAL_SERVER)
   Blynk.begin(AUTH, WIFI_SSID, WIFI_PASS, SERVER);
 #else
   Blynk.begin(AUTH, WIFI_SSID, WIFI_PASS);
 #endif
+
+  if (debug == 1) {
+    Serial.println("Connected.");
+    Serial.println("Connecting to Blynk...");
+  }
+
   while (Blynk.connect() == false) {}
-  ArduinoOTA.setHostname(OTA_HOSTNAME);
+
+  if (debug == 1) {
+    Serial.println("Connected to Blynk.");
+    Serial.println("Starting ArduinoOTA...");
+  }
+  
+  ArduinoOTA.setHostname(OTA_HOSTNAME );
   ArduinoOTA.begin();
 
-  timerTask1 = timer.setInterval(1000, updateBlynk);
-  timerTask2 = timer.setInterval(1000, doRegistryNumber);
-  timerTask3 = timer.setInterval(1000, nextRegistryNumber);
+  if (debug == 1) {
+    Serial.println("ArduinoOTA running.");
+    Serial.println("Starting timed actions...");
+  }
+  
+  timerTaskReadAndUpload = timer.setInterval(1000L, readAndUpload);
+
+  if (debug == 1) {
+    Serial.println("Setup OK!");
+    Serial.println("----------------------------");
+    Serial.println();
+  }
 }
 
 // --------------------------------------------------------------------------------
 
-void updateBlynk() {
-  Blynk.virtualWrite(vPIN_PV_POWER,         pvpower);
-  Blynk.virtualWrite(vPIN_PV_CURRENT,       pvcurrent);
-  Blynk.virtualWrite(vPIN_PV_VOLTAGE,       pvvoltage);
-  Blynk.virtualWrite(vPIN_LOAD_CURRENT,     lcurrent);
-  Blynk.virtualWrite(vPIN_LOAD_POWER,       lpower);
-  Blynk.virtualWrite(vPIN_BATT_TEMP,        btemp);
-  Blynk.virtualWrite(vPIN_BATT_VOLTAGE,     bvoltage);
-  Blynk.virtualWrite(vPIN_BATT_REMAIN,      bremaining);
-  Blynk.virtualWrite(vPIN_CONTROLLER_TEMP,  ctemp);
+uint8_t setOutputLoadPower(bool state) {
+
+  if (debug == 1) {
+    Serial.print("Writing coil 0x0006 value to: ");
+    Serial.println(state);
+  }
+  
+  // Set coil at address 0x0006 (Force the load on/off)
+  ESP.wdtDisable();
+  return node.writeSingleCoil(0x0006, (uint8_t)state);
+  ESP.wdtEnable();
 }
 
-void doRegistryNumber() {
-  Registries[currentRegistryNumber]();
+void readAndUpload() {
+  
+  readOutputLoadState();
+  readRealTimeDataRegister();
+  readStatisticalDataRegister();
+  
+  Blynk.virtualWrite(vPIN_PV_POWER,                   pvpower);
+  Blynk.virtualWrite(vPIN_PV_CURRENT,                 pvcurrent);
+  Blynk.virtualWrite(vPIN_PV_VOLTAGE,                 pvvoltage);
+  Blynk.virtualWrite(vPIN_LOAD_CURRENT,               lcurrent);
+  Blynk.virtualWrite(vPIN_LOAD_POWER,                 lpower);
+  Blynk.virtualWrite(vPIN_BATT_TEMP,                  btemp);
+  Blynk.virtualWrite(vPIN_BATT_VOLTAGE,               bvoltage);
+  Blynk.virtualWrite(vPIN_BATT_REMAIN,                bremaining);
+  Blynk.virtualWrite(vPIN_CONTROLLER_TEMP,            ctemp);
+  Blynk.virtualWrite(vPIN_BATTERY_CHARGE_CURRENT,     battChargeCurrent);
+  Blynk.virtualWrite(vPIN_BATTERY_CHARGE_POWER,       battChargePower);
+  Blynk.virtualWrite(vPIN_BATTERY_OVERALL_CURRENT,    battOverallCurrent);
+
+  Blynk.virtualWrite(vPIN_LOAD_ENABLED,               loadPoweredOn);
 }
 
-void AddressRegistry_3100() {
-  result = node.readInputRegisters(0x3100, 7);
+// callback to state changes by user from the blynk app
+BLYNK_WRITE(vPIN_LOAD_ENABLED) {
+  bool newState = (bool)param.asInt();
+  
+  if (debug == 1) {
+    Serial.print("Setting load state output coil to value: ");
+    Serial.println(newState);
+  }
+  
+  setOutputLoadPower(newState);
+
+  if (debug == 1) {
+    Serial.print("Read Output Load state value: ");
+    Serial.println(readOutputLoadState());
+  }
+}
+
+bool readOutputLoadState() {
+  ESP.wdtDisable();
+  result = node.readInputRegisters(0x903D, 1);
+  ESP.wdtEnable(1);
+
+  if (result == node.ku8MBSuccess) {
+    loadPoweredOn = (bool)((node.getResponseBuffer(0) | 0x0002) >> 1);
+
+    if (debug == 1) {
+      Serial.print("Load: ");
+      Serial.println(loadPoweredOn);
+    }
+  } else {
+    // update of status failed, whatever
+    if (debug == 1)
+      Serial.println("Load enable status read failed!");
+  }
+  return loadPoweredOn;
+}
+
+// reads Load Enable Override coil - not used
+uint8_t checkLoadState() {
+  if (debug == 1)
+    Serial.print("Reading coil 0x0006: ");
+    
+  result = node.readCoils(0x0006, 1);
+  
+  if (debug == 1) 
+    Serial.print(result == node.ku8MBSuccess ? "success" : "failed");
+  
+  if (result == node.ku8MBSuccess) {
+    loadPoweredOn = (bool)node.getResponseBuffer(0);
+  }
+
+  if (debug == 1) {
+    Serial.print(", value: ");
+    Serial.println(loadPoweredOn);
+  }
+  
+  return result;
+}
+
+void readRealTimeDataRegister() {
+  ESP.wdtDisable();
+  result = node.readInputRegisters(0x3100, 16);
+  ESP.wdtEnable(1);
+  
   if (result == node.ku8MBSuccess)
   {
-    ctemp = node.getResponseBuffer(0x11) / 100.0f;
-    if (debug == 1) {
-      Serial.println(ctemp);
-      Serial.print("Battery Voltage: ");
-    }
-    bvoltage = node.getResponseBuffer(0x04) / 100.0f;
-    if (debug == 1) {
-      Serial.println(bvoltage);
-
-    }
-    lpower = ((long)node.getResponseBuffer(0x0F) << 16 | node.getResponseBuffer(0x0E)) / 100.0f;
-    if (debug == 1) {
-      Serial.print("Load Power: ");
-      Serial.println(lpower);
-
-    }
-    lcurrent = (long)node.getResponseBuffer(0x0D) / 100.0f;
-    if (debug == 1) {
-      Serial.print("Load Current: ");
-      Serial.println(lcurrent);
-
-    }
-    pvvoltage = (long)node.getResponseBuffer(0x00) / 100.0f;
+    pvvoltage = node.getResponseBuffer(0x00) / 100.0f;
     if (debug == 1) {
       Serial.print("PV Voltage: ");
       Serial.println(pvvoltage);
-
     }
-    pvcurrent = (long)node.getResponseBuffer(0x01) / 100.0f;
+
+    pvcurrent = node.getResponseBuffer(0x01) / 100.0f;
     if (debug == 1) {
       Serial.print("PV Current: ");
       Serial.println(pvcurrent);
-
     }
-    pvpower = ((long)node.getResponseBuffer(0x03) << 16 | node.getResponseBuffer(0x02)) / 100.0f;
+
+    pvpower = ((uint32_t)node.getResponseBuffer(0x02) + node.getResponseBuffer(0x03) << 16) / 100.0f;
     if (debug == 1) {
       Serial.print("PV Power: ");
       Serial.println(pvpower);
     }
-    battBhargeCurrent = (long)node.getResponseBuffer(0x05) / 100.0f;
+    
+    bvoltage = node.getResponseBuffer(0x04) / 100.0f;
+    if (debug == 1) {
+      Serial.print("Battery Voltage: ");
+      Serial.println(bvoltage);
+    }
+    
+    battChargeCurrent = node.getResponseBuffer(0x05) / 100.0f;
     if (debug == 1) {
       Serial.print("Battery Charge Current: ");
-      Serial.println(battBhargeCurrent);
+      Serial.println(battChargeCurrent);
       Serial.println();
     }
-  } else {
-    rs485DataReceived = false;
-  }
-}
+    
+    battChargePower = ((uint32_t)node.getResponseBuffer(0x06) + node.getResponseBuffer(0x07) << 16)  / 100.0f;
+    if (debug == 1) {
+      Serial.print("Battery Charge Power: ");
+      Serial.println(battChargePower);
+      Serial.println();
+    }
 
-void AddressRegistry_311A() {
-  result = node.readInputRegisters(0x311A, 2);
-  if (result == node.ku8MBSuccess)
-  {
-    bremaining = node.getResponseBuffer(0x00) / 1.0f;
+    lcurrent = node.getResponseBuffer(0x0D) / 100.0f;
+    if (debug == 1) {
+      Serial.print("Load Current: ");
+      Serial.println(lcurrent);
+      Serial.println();
+    }
+
+    lpower = ((uint32_t)node.getResponseBuffer(0x0E) + node.getResponseBuffer(0x0F) << 16) / 100.0f;
+    if (debug == 1) {
+      Serial.print("Load Power: ");
+      Serial.println(lpower);
+    }
+    
+    bremaining = node.getResponseBuffer(0x1A) / 100.0f;
     if (debug == 1) {
       Serial.print("Battery Remaining %: ");
       Serial.println(bremaining);
-
     }
-    btemp = node.getResponseBuffer(0x01) / 100.0f;
+    
+    btemp = node.getResponseBuffer(0x1B) / 100.0f;
     if (debug == 1) {
       Serial.print("Battery Temperature: ");
       Serial.println(btemp);
@@ -157,8 +265,11 @@ void AddressRegistry_311A() {
   }
 }
 
-void AddressRegistry_3300() {
-  result = node.readInputRegisters(0x3300, 2);
+void readStatisticalDataRegister() {
+  ESP.wdtDisable();
+  result = node.readInputRegisters(0x3300, 16);
+  ESP.wdtEnable(1);
+  
   if (result == node.ku8MBSuccess)
   {
     stats_today_pv_volt_max = node.getResponseBuffer(0x00) / 100.0f;
@@ -166,11 +277,18 @@ void AddressRegistry_3300() {
       Serial.print("Stats Today PV Voltage MAX: ");
       Serial.println(stats_today_pv_volt_max);
     }
+    
     stats_today_pv_volt_min = node.getResponseBuffer(0x01) / 100.0f;
     if (debug == 1) {
       Serial.print("Stats Today PV Voltage MIN: ");
       Serial.println(stats_today_pv_volt_min);
     }
+
+    battDischargeCurrent = ((int32_t)node.getResponseBuffer(0x1B) + node.getResponseBuffer(0x1C) << 16) / 100.0f;
+    if (debug == 1) {
+      Serial.print("Battery Discharge Current: ");
+      Serial.println(battDischargeCurrent);
+    } 
   } else {
     rs485DataReceived = false;
   }
@@ -182,6 +300,7 @@ void loop()
   ArduinoOTA.handle();
   timer.run();
 }
+
 
 
 // --------------------------------------------------------------------------------
