@@ -23,7 +23,7 @@
 //#define SERVER                          IPAddress(192, 168, 1, 78)
 
 /*
-  Over The Air updates Hostname  
+  Over The Air Hostname  
 */
 #define OTA_HOSTNAME "SOLAR-MODBUS"
 

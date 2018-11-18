@@ -29,8 +29,8 @@ There is also a support forum on the Blynk community forums: http://community.bl
 
 Cut open your ethernet cable and split out pin 3, 5, 7 (B, A, GND). Refer to [Tracer Modbus PDF](doc/1733_modbus_protocol.pdf) for additional info.
 
-Follow the wiring guide below: ~~(note that the 2-pol switch is only needed during flashing)~~
-	- No longer needed!
+Follow the wiring guide below: ~~(note that the 2-pol switch is only needed during flashing)~~ **No longer needed!**
+
 ![Tracer Wiring Diagram](doc/schematic.png)
 
 ## Setup
@@ -118,7 +118,7 @@ It's powered from `+5V` from ESP8266, and wired as following:
 You are welcome for suggestions, bugreports, and of course any further improvements of this code.
 
 
-## `@tekk`'s Changelog
+## `@tekk`'s V2 Changelog
 - Rewrote whole sketch
 - Utilized HardwareSerial `UART2`
 	- `ModbusMaster` library is incopatible with `SoftwareSerial`, (don't even try)... Would need to rewrite whole lib, so Hardware UART is the only option for smooth & seamless communication because of the interrupt driven data transmission, more precise timing, and HW buffer
@@ -130,8 +130,7 @@ You are welcome for suggestions, bugreports, and of course any further improveme
 - Added calls to `ESP.wdtDisable()` and `ESP.wdtEnable(1)`, temporary System Watchdog shutdown
 	- Avoids unwanted rebooting of ESP8366 while receiving data from the Modbus
 - New UART buffers flushing system, ensuring correct and stable data transmission in both ways
-- Added more debug outputs to USB Serial
-- 
+- Added more debug outputs and results to USB Serial
 
 
 ## Credits

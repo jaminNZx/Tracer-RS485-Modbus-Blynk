@@ -5,6 +5,8 @@
 // MAX485: DE + RE interconnected with a jumper and connected to D3 or D4
 // Developed by @jaminNZx
 // With modifications by @tekk
+
+#include <HardwareSerial.h>
 #include <ArduinoOTA.h>
 #include <BlynkSimpleEsp8266.h>
 #include <SimpleTimer.h>
@@ -12,10 +14,6 @@
 #include <ESP8266WiFi.h>
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
-
-#ifndef Serial2
-#include <HardwareSerial.h>
-#endif
 
 #include "settings.h"
 
@@ -53,7 +51,7 @@ void postTransmission() {
 }
 
 // a list of the regisities to query in order
-typedef void (*RegistryList[]) ();
+typedef void (*RegistryList[])();
 
 RegistryList Registries = {
   AddressRegistry_3100,
@@ -67,8 +65,8 @@ uint8_t currentRegistryNumber = 0;
 // function to switch to next registry
 void nextRegistryNumber() {
   // better not use modulo, because after overlow it will start reading in incorrect order
-  currentRegistryNumber = currentRegistryNumber + 1;
-  if (currentRegistryNumber > ARRAY_SIZE(Registries) ) {
+  currentRegistryNumber++;
+  if (currentRegistryNumber >= ARRAY_SIZE(Registries) ) {
     currentRegistryNumber = 0;
   }
 }
@@ -83,14 +81,11 @@ void setup()
   digitalWrite(MAX485_RE_NEG, 0);
   digitalWrite(MAX485_DE, 0);
 
-  Serial.begin(BAUD_RATE);  
+  Serial.begin(BAUD_RATE);
   SerialModbus.begin(BAUD_RATE, SERIAL_8N1, SERIAL_FULL, D8);
   
   // Modbus slave ID 1
   node.begin(1, SerialModbus);
-
-  // function to be called in the idle time between transmission of data and response from slave
-  node.idle(flush_buffers);
 
   // callbacks to toggle DE + RE on MAX485
   node.preTransmission(preTransmission);
@@ -361,20 +356,17 @@ void checkLoadCoilState() {
   }
 
 void flush_buffers() {
-  const byte delMicro = 3;
+  const byte delMicro = 1;
 
   static uint64_t startTime = millis();
-  while (SerialModbus.available() && (startTime + delMicro > millis())) {
+  while (SerialModbus.available() && (startTime + delMicro >= millis())) {
     yield();
   }
 
   startTime = millis();
-  while (Serial.available() && (startTime + delMicro > millis())) {
+  while (Serial.available() && (startTime + delMicro >= millis())) {
     yield();
   }
-
-  SerialModbus.flush();
-  Serial.flush();
 }
 
 void loop()
@@ -382,6 +374,6 @@ void loop()
   Blynk.run();
   ArduinoOTA.handle();
   timer.run();
-  flush_buffers();
+  yield();
 }
 
