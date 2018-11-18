@@ -23,12 +23,12 @@
 //#define SERVER                          IPAddress(192, 168, 1, 78)
 
 /*
-  Over The Air Hostname  
+  Over The Air updates Hostname  
 */
 #define OTA_HOSTNAME "SOLAR-MODBUS"
 
 /*
-   Virtual Pins - Base
+   Virtual Pins - Base. (For Blynk)
 */
 #define vPIN_PV_POWER                   V1
 #define vPIN_PV_CURRENT                 V2
@@ -45,7 +45,10 @@
 #define vPIN_LOAD_ENABLED               V14
 
 /*
-   Debug. Change to 0 when you are finished debugging.
+   You don't have to change this. Debug outputs and results
+   are displayed on USB Serial of the ESP8266, and you don't
+   have to disconnect the RS485 interface every single upload
+   anymore, so it is not neccessary to turn this off anymore.
 */
 const int debug             =           1;
 

@@ -361,22 +361,18 @@ void checkLoadCoilState() {
   }
 
 void flush_buffers() {
+  const byte delMicro = 3;
 
-  static uint64_t startTime = 0UL;
-  const byte delMicro = 30;
-
-  if (SerialModbus.available()) {
-    startTime = millis();
-    while (startTime + delMicro > millis())
-      yield();
+  static uint64_t startTime = millis();
+  while (SerialModbus.available() && (startTime + delMicro > millis())) {
+    yield();
   }
 
-  if (Serial.available()) {
-    startTime = millis();
-    while (startTime + delMicro > millis())
-      yield();
+  startTime = millis();
+  while (Serial.available() && (startTime + delMicro > millis())) {
+    yield();
   }
-  
+
   SerialModbus.flush();
   Serial.flush();
 }

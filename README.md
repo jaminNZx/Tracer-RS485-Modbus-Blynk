@@ -1,16 +1,12 @@
 # Tracer-RS485-Modbus-Blynk V2.0
 
-> `@tekk:`
-> This is partially rewritten branch of the original project.
-> You are welcome for suggestions, bugreports, and of course any further improvements of this code.
-
+This is almost complete rewrite of the original [project](https://github.com/jaminNZx/Tracer-RS485-Modbus-Blynk), with ton of improvements, refactored code, brand new Blynk project, and wider compatibility of RS485 converters.
 
 ## Info
 
-An Arduino sketch to connect the EPSolar/EPEver Tracer A/B Series MPPT Solar controller (RS-485 Modbus) to an ESP8266 and monitor it using the Blynk mobile app.
+An Arduino project to connect the **EPSolar/EPEver Tracer A/B Series MPPT Solar Controller** (RS-485 Modbus) to an **ESP8266** and monitor it using the **Blynk** mobile app.
 
-Feel free to make pull requests if you wish to help develop it. 
-
+Feel free to make pull requests if you wish to help improving.
 There is also a support forum on the Blynk community forums: http://community.blynk.cc/t/epsolar-tracer-2210a-charge-controller-blynk-epic-solar-monitor/10596
 
 ## Hardware
@@ -31,9 +27,10 @@ There is also a support forum on the Blynk community forums: http://community.bl
 
 ## Wiring
 
-Cut open your ethernet cable and split out pin 3,5,7 (B,A,GND). Refer to [Tracer Modbus PDF](doc/1733_modbus_protocol.pdf) for additional info.
+Cut open your ethernet cable and split out pin 3, 5, 7 (B, A, GND). Refer to [Tracer Modbus PDF](doc/1733_modbus_protocol.pdf) for additional info.
 
-Follow the wiring guide below: (note that the 2-pol switch is only needed during flashing)
+Follow the wiring guide below: ~~(note that the 2-pol switch is only needed during flashing)~~
+	- No longer needed!
 ![Tracer Wiring Diagram](doc/schematic.png)
 
 ## Setup
@@ -46,14 +43,14 @@ Follow the wiring guide below: (note that the 2-pol switch is only needed during
 
 ### Tutorial
 
-# Create wifi_credentials.h library 
+# Create `wifi_credentials.h` library
 
 Firstly, create a folder in your sketch **OR** your libraries folder called `esp_credentials`. Then create a new file called `esp_credentials.h` inside it.
 
 Edit the file and enter the following template.
-Change the details for your own wifi network. 
+Change the details for your own WiFi network.
 
-You will be able to use this file by including it in any sketch by entering ```#include <esp_credentials.h>```. (This is already present in `settings.h`, there's no need to add it.)
+You will be able to use this file by including it in any sketch by entering ```#include <esp_credentials.h>```. (This include is already present in `settings.h`, there's no need to add it.)
 
 ```cpp
 /**************************************************************
@@ -69,49 +66,48 @@ You will be able to use this file by including it in any sketch by entering ```#
 ![Project QR Code](http://i.imgur.com/xBEmJyJ.jpg)
 
 * Send yourself the generated auth code
-* Paste your auth code in to the `esp_credentials.h` file
+* Paste your auth code in to the `esp_credentials.h` file:
 
 ```cpp
 #define AUTH                  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
-* ~~Disconnect the TX/RX cables (or open the switch if you have one)~~
-	* [@tekk](https://github.com/tekk): You don't have to do this anymore! This version is using Serial1 on pins `D13` and `D2` to communicate with RS485 module
+* ~~Disconnect TX/RX cables (or open the switch if you have one)~~
+	* You don't have to do this anymore! This version is using `UART2` on pins `D7` and `D8` to communicate with RS485 module
 * Upload the sketch to your ESP8266
 * ~~Once uploaded, reconnect the TX/RX cables and plug the cable in to the Tracer COM port~~
-	* [@tekk](https://github.com/tekk): Just plug the cable, but it is always a good idea to repower the MAX485 module between sketch uploads / Serial2 reconnects
-* Load the Blynk project and hit the PLAY button to start receiving data
+	* Just plug the ethernet cable to the Solar controller. Anyhow, it is always a good idea to repower the MAX485 module, if you're using one, between sketch uploads / `UART2` reconnects
+* Load the Blynk project and hit PLAY button to start receiving data
 
 ## Reference
 
 [Tracer A/B Series MPPT Solar Controller - Modbus Protocol](doc/1733_modbus_protocol.pdf)
 
 ## MAX485 module
-`@tekk:`
-	
 ![This one worked for me](doc/max485_module.jpg)
 
 I'm using this cheapo module and it works quite fine.
-It's powered from +5V on ESP8266, and wired as following:
+It's powered from `+5V` from ESP8266, and wired as following:
 
-- MAX485 module <-> ESP8266:
-	- `DI` -> `D7`
-	- `RO` -> `D8`
-	- `DE` and `RE` interconnected with a jumper and then connected do eighter `D3` or `D4`
+- MAX485 module <-> ESP8266
+	- `DI` -> `D7`?
+	- `RO` -> `D8`?
+	- `DE` and `RE` are interconnected with a jumper and then connected do eighter pin `D3` or `D4`
 	- `VCC` to `+5V` on ESP8266
 
 
-- Tracer A/B MPPT - Ethernet cable to MAX485
+- Tracer A/B MPPT Controller Ethernet cable <-> MAX485
 	- Ethernet green, pin `5` -> `A`
 	- Ethernet blue, pin `3` -> `B`
 	- Ethernet brown, pin `7` -> `GND` on module **and** ESP8266 `GND` pin
+		- -> to prevent ground loops
 
 
 ## Modbus serial port
-- RS485 Serial port is remapped internally to `UART2`
+- RS485 Serial is remapped internally to `UART2`
 - TX pin is mapped to `GPIO15`/`D8`
 - RX pin is mapped to `GPIO14`/`D7`
-	- `UART2` is mapped according to this image:
+	- `UART2` is mapped to `RXD2` and `TXD2`, in case of NodeMCU - according to this image:
 ![ESP8266 NodeMCU v0.9](doc/nodemcu_pins.png)
 
 ## Developing further
@@ -119,8 +115,24 @@ It's powered from +5V on ESP8266, and wired as following:
 > I plan to add more features and pull more data from the controller once I have my own solar system running.
 > If you'd like to pick this up and have a go at adding features, I'll be happy to accept pull requests.
 
+You are welcome for suggestions, bugreports, and of course any further improvements of this code.
+
+
 ## `@tekk`'s Changelog
-- TODO
+- Rewrote whole sketch
+- Utilized HardwareSerial `UART2`
+	- `ModbusMaster` library is incopatible with `SoftwareSerial`, (don't even try)... Would need to rewrite whole lib, so Hardware UART is the only option for smooth & seamless communication because of the interrupt driven data transmission, more precise timing, and HW buffer
+- Optimized for very cheap MAX485 module, you can buy it from usual sources...
+- **Feature:** Added option to switch the output of the Tracer MPPT Controller ON/OFF from the Blynk app
+- **Improvement:** You no longer need to disconnect and reconnect Modbus RS485 Serial port from the ESP8266 while uploading
+- Code rewrote to use as little magic constants as possible
+- Added `preTransmission` abd `postTransmission` Modbus handling / signalling, just to be sure...
+- Added calls to `ESP.wdtDisable()` and `ESP.wdtEnable(1)`, temporary System Watchdog shutdown
+	- Avoids unwanted rebooting of ESP8366 while receiving data from the Modbus
+- New UART buffers flushing system, ensuring correct and stable data transmission in both ways
+- Added more debug outputs to USB Serial
+- 
+
 
 ## Credits
 
