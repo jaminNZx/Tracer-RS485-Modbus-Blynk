@@ -92,7 +92,7 @@ It's powered from `+5V` from ESP8266, and wired as following:
 - MAX485 module <-> ESP8266
 	- `DI` -> `D7`?
 	- `RO` -> `D8`?
-	- `DE` and `RE` are interconnected with a jumper and then connected do eighter pin `D3` or `D4`
+	- `DE` and `RE` are interconnected with a jumper and then connected do eighter pin `D1` or `D2`
 	- `VCC` to `+5V` on ESP8266
 
 

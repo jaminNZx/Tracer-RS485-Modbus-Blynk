@@ -1,8 +1,8 @@
-// CONNECT THE RS485 MODULE RX->D7, TX->D8. (SerialModbus is on UART2)
+// CONNECT THE RS485 MODULE. ESP8266 RX = D7, TX = D8. (SerialModbus is on UART2)
 // You do not need to disconnect the RS485 while uploading code.
 // Tested on NodeMCU + MAX485 module
-// RJ 45 cable: Green -> A, Blue -> B
-// MAX485: DE + RE interconnected with a jumper and connected to D3 or D4
+// RJ 45 cable: Green -> A, Blue -> B, Brown -> GND module + GND ESP8266
+// MAX485: DE + RE interconnected with a jumper and connected to D1 or D2
 // Developed by @jaminNZx
 // With modifications by @tekk
 
@@ -19,6 +19,7 @@
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
+const int defaultBaudRate = 115200;
 int timerTask1, timerTask2, timerTask3, timerTask4;
 float battChargeCurrent, battDischargeCurrent, battOverallCurrent, battChargePower;
 float bvoltage, ctemp, btemp, bremaining, lpower, lcurrent, pvvoltage, pvcurrent, pvpower;
@@ -27,14 +28,11 @@ uint8_t result;
 bool rs485DataReceived = true;
 bool loadPoweredOn = true;
 
-#define MAX485_DE D3
-#define MAX485_RE_NEG D4
-#define BAUD_RATE 115200
+#define MAX485_DE D1
+#define MAX485_RE_NEG D2
 
-#ifdef Serial2
-  #define SerialModbus Serial2
-#else
-  HardwareSerial SerialModbus(2);
+#ifndef UART2
+#define UART2 2
 #endif
 
 ModbusMaster node;
@@ -50,7 +48,7 @@ void postTransmission() {
   digitalWrite(MAX485_DE, 0);
 }
 
-// a list of the regisities to query in order
+// A list of the regisities to query in order
 typedef void (*RegistryList[])();
 
 RegistryList Registries = {
@@ -75,15 +73,35 @@ void nextRegistryNumber() {
 
 void setup()
 {
+  // overcurrent protection
+  delay(1000);
+
   pinMode(MAX485_RE_NEG, OUTPUT);
   pinMode(MAX485_DE, OUTPUT);
   
   digitalWrite(MAX485_RE_NEG, 0);
   digitalWrite(MAX485_DE, 0);
-
-  Serial.begin(BAUD_RATE);
-  SerialModbus.begin(BAUD_RATE, SERIAL_8N1, SERIAL_FULL, D8);
   
+//  Serial.begin(defaultBaudRate, SERIAL_8N1, SERIAL_FULL, 1);
+//  SerialModbus.begin(defaultBaudRate, SERIAL_8N1, SERIAL_FULL, 15);
+  Serial.begin(defaultBaudRate);
+
+  
+  //Serial = new HardwareSerial(UART0);
+  //Serial1 is on UART2, it's just Serial2 isn't defined as extern in "HardwareSerial.h"
+  //so this is a workaround...
+//  delete &Serial1;
+//  HardwareSerial *Serial1 = new HardwareSerial(UART2);
+
+  noInterrupts();
+  delete &Serial1;
+  HardwareSerial *Serial1 = new HardwareSerial(UART2);
+  interrupts();
+
+  #define SerialModbus Serial1
+
+  SerialModbus.begin(defaultBaudRate);
+
   // Modbus slave ID 1
   node.begin(1, SerialModbus);
 
