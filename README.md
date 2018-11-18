@@ -48,12 +48,12 @@ Follow the wiring guide below: (note that the 2-pol switch is only needed during
 
 # Create wifi_credentials.h library 
 
-Firstly, create a folder in your sketch **OR** libraries folder called `esp_credentials`. Then create a new file call `esp_credentials.h` inside it.
+Firstly, create a folder in your sketch **OR** your libraries folder called `esp_credentials`. Then create a new file called `esp_credentials.h` inside it.
 
 Edit the file and enter the following template.
 Change the details for your own wifi network. 
 
-You will be able to use this file by including it in any sketch by entering ```#include <esp_credentials.h>```. (This is already present in the `settings.h` file, no need to add it to this project.)
+You will be able to use this file by including it in any sketch by entering ```#include <esp_credentials.h>```. (This is already present in `settings.h`, there's no need to add it.)
 
 ```cpp
 /**************************************************************
@@ -105,8 +105,15 @@ It's powered from +5V on ESP8266, and wired as following:
 	- Ethernet green, pin `5` -> `A`
 	- Ethernet blue, pin `3` -> `B`
 	- Ethernet brown, pin `7` -> `GND` on module **and** ESP8266 `GND` pin
-	
-	
+
+
+## Modbus serial port
+- RS485 Serial port is remapped internally to `UART2`
+- TX pin is mapped to `GPIO15`/`D8`
+- RX pin is mapped to `GPIO14`/`D7`
+	- `UART2` is mapped according to this image:
+![ESP8266 NodeMCU v0.9](doc/nodemcu_pins.png)
+
 ## Developing further
 
 > I plan to add more features and pull more data from the controller once I have my own solar system running.
