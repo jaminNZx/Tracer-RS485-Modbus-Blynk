@@ -1,8 +1,13 @@
-# Tracer-RS485-Modbus-Blynk - [@tekk](https://github.com/tekk)'s branch
-An arduino sketch to connect the EPSolar/EPEver Tracer A/B Series MPPT Solar controller (RS-485 Modbus) to an ESP8266 and monitor it using the Blynk mobile app.
+# Tracer-RS485-Modbus-Blynk V2.0
 
-> This is partially rewritten branch of the original project made by [@tekk](https://github.com/tekk)
-> You are welcome for suggestions and further improvements of this code
+> `@tekk:`
+> This is partially rewritten branch of the original project.
+> You are welcome for suggestions, bugreports, and of course any further improvements of this code.
+
+
+## Info
+
+An Arduino sketch to connect the EPSolar/EPEver Tracer A/B Series MPPT Solar controller (RS-485 Modbus) to an ESP8266 and monitor it using the Blynk mobile app.
 
 Feel free to make pull requests if you wish to help develop it. 
 
@@ -12,7 +17,7 @@ There is also a support forum on the Blynk community forums: http://community.bl
 
 * [EPSolar/EPEver Tracer A/B-Series](https://www.aliexpress.com/wholesale?catId=0&initiative_id=SB_20170114172728&SearchText=tracer+mppt+rs485)
 
-* [RS485 UART Module](https://www.aliexpress.com/wholesale?catId=0&initiative_id=SB_20170114172807&SearchText=uart+rs485) (not the MAX485 chip! - note: [@tekk](https://github.com/tekk) uses MAX485 cheapo module and it works fine!)
+* [RS485 UART Module](https://www.aliexpress.com/wholesale?catId=0&initiative_id=SB_20170114172807&SearchText=uart+rs485) (~~not the MAX485 chip!~~ - `@tekk:` I'm using [MAX485 cheapo module](doc/max485_module.jpg) and it works fine!)
 
 * [ESP8266 Dev Board](https://www.aliexpress.com/wholesale?catId=0&initiative_id=SB_20170114172938&SearchText=esp8266+mini)
 
@@ -74,24 +79,47 @@ You will be able to use this file by including it in any sketch by entering ```#
 	* [@tekk](https://github.com/tekk): You don't have to do this anymore! This version is using Serial1 on pins `D13` and `D2` to communicate with RS485 module
 * Upload the sketch to your ESP8266
 * ~~Once uploaded, reconnect the TX/RX cables and plug the cable in to the Tracer COM port~~
-	* [@tekk](https://github.com/tekk): Just plug the cable, but it is always a good idea to repower the MAX485 module between sketch uploads
+	* [@tekk](https://github.com/tekk): Just plug the cable, but it is always a good idea to repower the MAX485 module between sketch uploads / Serial2 reconnects
 * Load the Blynk project and hit the PLAY button to start receiving data
 
 ## Reference
 
-[Tracer A/B Series Modbus Protocol](doc/1733_modbus_protocol.pdf)
+[Tracer A/B Series MPPT Solar Controller - Modbus Protocol](doc/1733_modbus_protocol.pdf)
 
+## MAX485 module
+`@tekk:`
+	
+![This one worked for me](doc/max485_module.jpg)
+
+I'm using this cheapo module and it works quite fine.
+It's powered from +5V on ESP8266, and wired as following:
+
+- MAX485 module <-> ESP8266:
+	- `DI` -> `D7`
+	- `RO` -> `D8`
+	- `DE` and `RE` interconnected with a jumper and then connected do eighter `D3` or `D4`
+	- `VCC` to `+5V` on ESP8266
+
+
+- Tracer A/B MPPT - Ethernet cable to MAX485
+	- Ethernet green, pin `5` -> `A`
+	- Ethernet blue, pin `3` -> `B`
+	- Ethernet brown, pin `7` -> `GND` on module **and** ESP8266 `GND` pin
+	
+	
 ## Developing further
 
-I plan to add more features and pull more data from the controller once I have my own solar system running.
+> I plan to add more features and pull more data from the controller once I have my own solar system running.
+> If you'd like to pick this up and have a go at adding features, I'll be happy to accept pull requests.
 
-If you'd like to pick this up and have a go at adding features, I'll be happy to accept pull requests. 
+## `@tekk`'s Changelog
+- TODO
 
 ## Credits
 
-#### @jaminNZx:
-Thanks to subtafuge on [Reddit](https://www.reddit.com/r/esp8266/comments/59dt00/using_esp8266_to_connect_rs485_modbus_protocol/) for lending me his working Tracer RS485 code! 
+- `@jaminNZx:`
+	- Thanks to subtafuge on [Reddit](https://www.reddit.com/r/esp8266/comments/59dt00/using_esp8266_to_connect_rs485_modbus_protocol/) for lending me his working Tracer RS485 code! 
 
-#### @tekk:
-Feel free to [contact me](mailto:tekk.sk@gmail.com) about my code changes
-Thanks to [@jaminNZx](https://github.com/jaminNZx) for the original code! Big up!
+- `@tekk:`
+	- Feel free to [contact me](mailto:tekk.sk@gmail.com) about my code changes
+	- Thanks to [@jaminNZx](https://github.com/jaminNZx) for the original code. Big up!
