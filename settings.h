@@ -5,30 +5,27 @@
  **************************************************************/
 /*
    Auth Codes & Wifi info go in the following file.
-   Create a new folder in your library dir called 'wifi_credentials'
-   and create a new file called 'wifi_credentials.h' and copy the 
-   example in the repo. You can use this for all your wifi projects. 
+   Create a new folder in your library dir called 'esp_credentials'
+   and create a new file called 'esp_credentials.h' or move the 
+   example dir in the repo. You can use this for all your wifi projects. 
    
-   Example wifi_credentials.h will look like this:
+   Example esp_credentials.h is in ./esp-credentials/esp-credentials.h
 */
 
-#define WIFI_SSID             "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-#define WIFI_PASS             "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-
-// Blynk API key
-#define AUTH                  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+// include WIFI credentials, and Blynk auth token credentials
+#include <esp_credentials.h>
 
 /*
    Local Server Settings
    Comment out to use Cloud Server
 */
-//#define USE_LOCAL_SERVER       
+//#define USE_LOCAL_SERVER
 //#define SERVER                          IPAddress(192, 168, 1, 78)
 
 /*
   Over The Air Hostname  
 */
-#define OTA_HOSTNAME "MPPT-MODBUS"
+#define OTA_HOSTNAME "SOLAR-MODBUS"
 
 /*
    Virtual Pins - Base

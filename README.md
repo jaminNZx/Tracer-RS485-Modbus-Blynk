@@ -41,7 +41,14 @@ Follow the wiring guide below: (note that the 2-pol switch is only needed during
 
 ### Tutorial
 
-* Setup your wifi credentials and Blynk API key
+# Create wifi_credentials.h library 
+
+Firstly, create a folder in your sketch **OR** libraries folder called `esp_credentials`. Then create a new file call `esp_credentials.h` inside it.
+
+Edit the file and enter the following template.
+Change the details for your own wifi network. 
+
+You will be able to use this file by including it in any sketch by entering ```#include <esp_credentials.h>```. (This is already present in the `settings.h` file, no need to add it to this project.)
 
 ```cpp
 /**************************************************************
@@ -57,7 +64,7 @@ Follow the wiring guide below: (note that the 2-pol switch is only needed during
 ![Project QR Code](http://i.imgur.com/xBEmJyJ.jpg)
 
 * Send yourself the generated auth code
-* Paste your auth code in to the settings.h file
+* Paste your auth code in to the `esp_credentials.h` file
 
 ```cpp
 #define AUTH                  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
