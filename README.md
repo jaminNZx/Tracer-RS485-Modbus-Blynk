@@ -43,7 +43,7 @@ Follow the wiring guide below: ~~(note that the 2-pol switch is only needed duri
 
 ### Tutorial
 
-# Create `wifi_credentials.h` library
+# Create `esp_credentials.h` library
 
 Firstly, create a folder in your sketch **OR** your libraries folder called `esp_credentials`. Then create a new file called `esp_credentials.h` inside it.
 
