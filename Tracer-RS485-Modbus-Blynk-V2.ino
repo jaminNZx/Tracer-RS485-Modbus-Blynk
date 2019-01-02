@@ -105,6 +105,12 @@ void setup()
   Blynk.begin(AUTH, WIFI_SSID, WIFI_PASS);
 #endif
 
+  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    Serial.println("Connection Failed! Rebooting...");
+    delay(5000);
+    ESP.restart();
+  }
+  
   Serial.println("Connected.");
   Serial.print("Connecting to Blynk...");
 
@@ -116,12 +122,6 @@ void setup()
   Serial.println();
   Serial.println("Connected to Blynk.");
   Serial.println("Starting ArduinoOTA...");
-  
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("Connection Failed! Rebooting...");
-    delay(5000);
-    ESP.restart();
-  }
 
   ArduinoOTA.setHostname(OTA_HOSTNAME);
 
