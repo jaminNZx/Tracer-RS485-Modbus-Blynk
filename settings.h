@@ -12,7 +12,7 @@
    Example esp_credentials.h is in ./esp-credentials/esp-credentials.h
 */
 
-// include WIFI credentials, and Blynk auth token credentials
+// include WIFI credentials and Blynk auth token credentials
 #include "esp_credentials/esp_credentials.h"
 
 /*
@@ -51,4 +51,3 @@
    anymore, so it is not neccessary to turn this off anymore.
 */
 const int debug             =           1;
-
