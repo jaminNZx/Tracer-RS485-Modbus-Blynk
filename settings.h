@@ -43,11 +43,3 @@
 #define vPIN_BATTERY_CHARGE_POWER       V11
 #define vPIN_BATTERY_OVERALL_CURRENT    V12
 #define vPIN_LOAD_ENABLED               V14
-
-/*
-   You don't have to change this. Debug outputs and results
-   are displayed on USB Serial of the ESP8266, and you don't
-   have to disconnect the RS485 interface every single upload
-   anymore, so it is not neccessary to turn this off anymore.
-*/
-const int debug             =           1;
