@@ -363,7 +363,7 @@ void setup()
       Serial.println(battOverallCurrent);
     } else {
       rs485DataReceived = false;
-      Serial.println("Read register 0x3300 failed!");
+      Serial.println("Read register 0x331B failed!");
     }
   }
 
