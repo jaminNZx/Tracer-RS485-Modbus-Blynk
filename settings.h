@@ -13,7 +13,7 @@
 */
 
 // include WIFI credentials and Blynk auth token credentials
-#include "esp_credentials/esp_credentials.h"
+#include "esp_credentials.h"
 
 /*
    Local Server Settings
